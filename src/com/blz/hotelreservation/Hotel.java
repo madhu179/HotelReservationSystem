@@ -17,7 +17,7 @@ public class Hotel {
 		return hotelName;
 	}
 
-	public int getHotelRateRegularr() {
+	public int getHotelRateRegular() {
 		return hotelRateRegular;
 	}
 
