@@ -1,5 +1,6 @@
 package com.blz.hotelreservation;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -32,31 +33,66 @@ public class HotelReservationMain {
 		date = scannerObject.nextLine();
 		LocalDate lastDate = LocalDate.parse(date);
 		
-		findCheapHotel(firstDate,lastDate);
+		findCheapHotelsWeekdayandWeekend(firstDate,lastDate);
 	}
 	
-	public static void findCheapHotel(LocalDate firstDate, LocalDate lastDate)
+	public static void findCheapHotelsWeekdayandWeekend(LocalDate firstDate, LocalDate lastDate)
 	{
+		DayOfWeek dayName;
 		int minimumRent=2147483647;
 		int rent =0;
 		LocalDate localFirstDate = firstDate;
-		lastDate = lastDate.plusDays(1);
+		lastDate=lastDate.plusDays(1);
 		String hotelName="";
+		ArrayList<String> listOfHotels = new ArrayList<String>();
 		for(Hotel h : hotelsArrayList)
 		{
+			localFirstDate = firstDate;
 			rent = 0;
-			for (localFirstDate = firstDate; localFirstDate.isBefore(lastDate); localFirstDate = localFirstDate.plusDays(1))
+			
+			for(localFirstDate=firstDate;localFirstDate.isBefore(lastDate);localFirstDate=localFirstDate.plusDays(1))
 			{
-				rent = rent + h.getHotelWeekendRateRegular();
+				dayName = localFirstDate.getDayOfWeek();
+				switch(dayName)
+					{
+					case MONDAY:
+					case TUESDAY:
+					case WEDNESDAY:
+					case THURSDAY:
+					case FRIDAY:
+						rent = rent + h.getHotelWeekdayRateRegular();
+						break;
+					case SATURDAY:
+						rent = rent + h.getHotelWeekendRateRegular();
+						break;
+					case SUNDAY:
+						rent = rent + h.getHotelWeekendRateRegular();
+						break;
+					}
 			}
 			
 			if(rent<minimumRent)
 			{
 				minimumRent = rent;
 				hotelName = h.getHotelName();
+				if(listOfHotels.isEmpty())
+				{
+					listOfHotels.add(hotelName);
+				}
+				else
+				{
+					listOfHotels.clear();
+					listOfHotels.add(hotelName);
+				}
+				    
 			}
+			else if(rent==minimumRent)
+				listOfHotels.add(h.getHotelName());
 		}
-		
-		System.out.println(hotelName+", Total Fare "+minimumRent);
+		for(int i=0;i<listOfHotels.size();i++)
+		{
+		System.out.print(listOfHotels.get(i)+" ,");
+		}
+		System.out.println("with Total rates $"+minimumRent);	
 	}
 }
