@@ -41,7 +41,8 @@ public class HotelReservationMain {
 			System.out.println("Please Enter your choice :");
 			System.out.println("1.Find Cheapest Hotels");
 			System.out.println("2.Find Cheapest and Best Rated Hotel");
-			System.out.println("3.Exit");
+			System.out.println("3.Find Best Rated Hotel");
+			System.out.println("4.Exit");
 			choice = Integer.parseInt(scannerObject.nextLine());
 			switch (choice) {
 			case 1:
@@ -50,11 +51,16 @@ public class HotelReservationMain {
 			case 2:
 				findCheapBestRatedHotel(firstDate, lastDate);
 				break;
+			case 3:
+				findBestRatedHotel(firstDate, lastDate);
+				break;
+			case 4:
+				break;
 			default:
 				System.out.println("Invalid choice, Choose again");
 			}
 
-		} while (choice != 3);
+		} while (choice != 4);
 	}
 
 	public static void findCheapHotelsWeekdayandWeekend(LocalDate firstDate, LocalDate lastDate) {
@@ -151,5 +157,49 @@ public class HotelReservationMain {
 		}
 
 		System.out.println(hotelName + " , Rating is " + hotelRatingVar + " with Total rates $" + minimumRent);
+	}
+	
+	public static void findBestRatedHotel(LocalDate firstDate, LocalDate lastDate)
+	{
+		DayOfWeek dayName;
+		int rent = 0;
+		int hotelRatingVar=0;
+		LocalDate localFirstDate = firstDate;
+		lastDate = lastDate.plusDays(1);
+		String hotelName = "";
+		for(Hotel h : hotelsArrayList)
+		{
+			
+			if(h.getHotelRating()>hotelRatingVar) 
+			{
+			rent =0;
+			hotelRatingVar = h.getHotelRating();
+			hotelName = h.getHotelName();
+			localFirstDate = firstDate;
+			
+			for(localFirstDate=firstDate;localFirstDate.isBefore(lastDate);localFirstDate=localFirstDate.plusDays(1))
+			{
+				dayName = localFirstDate.getDayOfWeek();
+				switch(dayName)
+					{
+					case MONDAY:
+					case TUESDAY:
+					case WEDNESDAY:
+					case THURSDAY:
+					case FRIDAY:
+						rent = rent + h.getHotelWeekdayRateRegular();
+						break;
+					case SATURDAY:
+						rent = rent + h.getHotelWeekendRateRegular();
+						break;
+					case SUNDAY:
+						rent = rent + h.getHotelWeekendRateRegular();
+						break;
+					}
+			}
+			}				
+		}
+
+		System.out.println(hotelName+" & Total rates $"+rent);	
 	}
 }
