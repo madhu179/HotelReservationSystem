@@ -14,10 +14,13 @@ public class HotelReservationMain {
 			System.out.println("Enter Hotel Name :");
 			String hotelName = scannerObject.nextLine();
 
-			System.out.println("Enter hotel's rate for regular customer");
-			int hotelRateRegular = Integer.parseInt(scannerObject.nextLine());
-
-			Hotel hotel = new Hotel(hotelName, hotelRateRegular);
+			System.out.println("Enter hotel's weekday rate for regular customer");
+			int hotelWeekdayRateRegular=Integer.parseInt(scannerObject.nextLine());
+			
+			System.out.println("Enter hotel's weekdend rate for regular customer");
+			int hotelWeekendRateRegular=Integer.parseInt(scannerObject.nextLine());
+			
+			Hotel hotel=new Hotel(hotelName,hotelWeekdayRateRegular,hotelWeekendRateRegular);
 			hotelsArrayList.add(hotel);
 		}
 		System.out.println("All hotel details addes successfully!");
@@ -44,7 +47,7 @@ public class HotelReservationMain {
 			rent = 0;
 			for (localFirstDate = firstDate; localFirstDate.isBefore(lastDate); localFirstDate = localFirstDate.plusDays(1))
 			{
-				rent = rent + h.getHotelRateRegular();
+				rent = rent + h.getHotelWeekendRateRegular();
 			}
 			
 			if(rent<minimumRent)
