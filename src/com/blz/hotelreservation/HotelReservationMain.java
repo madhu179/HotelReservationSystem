@@ -3,13 +3,29 @@ package com.blz.hotelreservation;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+@FunctionalInterface
+ interface LambdaInterface{
+	boolean validate(String regex,String date) throws Exception;
+}
 
 public class HotelReservationMain {
+	
+	static LambdaInterface function = (regex,date)->{
+		Pattern pattern = Pattern.compile(regex);
+		Matcher m = pattern.matcher(date);
+        if(m.matches())
+        	return true;
+		throw new Exception("Inavlid Date Format");
+	};
 
 	private static ArrayList<Hotel> hotelsArrayList = new ArrayList<Hotel>();
 
 	public static void main(String[] args) {
 		Scanner scannerObject = new Scanner(System.in);
+		int customerType=0;
 		System.out.println("Enter the hotel details to add a hotel:");
 		for (int i = 0; i < 3; i++) {
 			System.out.println("Enter Hotel Name :");
@@ -19,27 +35,53 @@ public class HotelReservationMain {
 			int hotelRating = Integer.parseInt(scannerObject.nextLine());
 
 			System.out.println("Enter hotel's weekday rate for regular customer");
-			int hotelWeekdayRateRegular=Integer.parseInt(scannerObject.nextLine());
-			
+			int hotelWeekdayRateRegular = Integer.parseInt(scannerObject.nextLine());
+
 			System.out.println("Enter hotel's weekdend rate for regular customer");
-			int hotelWeekendRateRegular=Integer.parseInt(scannerObject.nextLine());
-			
+			int hotelWeekendRateRegular = Integer.parseInt(scannerObject.nextLine());
+
 			System.out.println("Enter hotel's weekday rate for reward customer");
-			int hotelWeekdayRateReward=Integer.parseInt(scannerObject.nextLine());
-			
+			int hotelWeekdayRateReward = Integer.parseInt(scannerObject.nextLine());
+
 			System.out.println("Enter hotel's weekdend rate for reward customer");
-			int hotelWeekendRateReward=Integer.parseInt(scannerObject.nextLine());
-			
-			Hotel hotel=new Hotel(hotelName,hotelRating,hotelWeekdayRateRegular,hotelWeekendRateRegular,hotelWeekdayRateReward,hotelWeekendRateReward);
+			int hotelWeekendRateReward = Integer.parseInt(scannerObject.nextLine());
+
+			Hotel hotel = new Hotel(hotelName, hotelRating, hotelWeekdayRateRegular, hotelWeekendRateRegular,
+					hotelWeekdayRateReward, hotelWeekendRateReward);
 			hotelsArrayList.add(hotel);
 		}
 		System.out.println("All hotel details addes successfully!");
 
+		System.out.println("Enter Customer Type : (Reward/Regular)");
+		 try {
+			 String customer = scannerObject.nextLine();
+			 if(customer.equals("Regular")||customer.equals("Reward"))
+				 customerType = customer.contentEquals("Regular") ? 1: 2;
+			 else
+				 throw new Exception("Invalid Customer Type");	 
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
+		
+		
 		System.out.println("Enter the start date of stay in YYYY-MM-DD format");
 		String date = scannerObject.nextLine();
+		try {
+			boolean result = function.validate("[1-9][0-9][0-9][0-9][-][0-1][0-9][-][0-3][0-9]",date);
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
 		LocalDate firstDate = LocalDate.parse(date);
 		System.out.println("Enter the end date of stay in YYYY-MM-DD format");
 		date = scannerObject.nextLine();
+		try {
+			boolean result = function.validate("[1-9][0-9][0-9][0-9][-][0-1][0-9][-][0-3][0-9]",date);
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
 		LocalDate lastDate = LocalDate.parse(date);
 
 		int choice = 0;
@@ -52,15 +94,15 @@ public class HotelReservationMain {
 			choice = Integer.parseInt(scannerObject.nextLine());
 			switch (choice) {
 			case 1:
-				findCheapHotelsWeekdayandWeekend(firstDate, lastDate);
+				findCheapHotelsWeekdayandWeekend(customerType,firstDate,lastDate);
 				break;
 			case 2:
-				findCheapBestRatedHotel(firstDate, lastDate);
+				findBestRatedHotelRewardORRegular(customerType,firstDate,lastDate);
 				break;
 			case 3:
-				findBestRatedHotel(firstDate, lastDate);
-				break;
-			case 4:
+				findCheapBestRatedHotelRewardORRegular(customerType,firstDate,lastDate);
+				break;	
+			case 4: 
 				break;
 			default:
 				System.out.println("Invalid choice, Choose again");
@@ -69,7 +111,7 @@ public class HotelReservationMain {
 		} while (choice != 4);
 	}
 
-	public static void findCheapHotelsWeekdayandWeekend(LocalDate firstDate, LocalDate lastDate) {
+	public static void findCheapHotelsWeekdayandWeekend(int customerType,LocalDate firstDate, LocalDate lastDate) {
 		DayOfWeek dayName;
 		int minimumRent = 2147483647;
 		int rent = 0;
@@ -84,18 +126,39 @@ public class HotelReservationMain {
 			for (localFirstDate = firstDate; localFirstDate
 					.isBefore(lastDate); localFirstDate = localFirstDate.plusDays(1)) {
 				dayName = localFirstDate.getDayOfWeek();
-				switch (dayName) {
-				case MONDAY:
-				case TUESDAY:
-				case WEDNESDAY:
-				case THURSDAY:
-				case FRIDAY:
-					rent = rent + h.getHotelWeekdayRateRegular();
-					break;
-				case SATURDAY:
-				case SUNDAY:
-					rent = rent + h.getHotelWeekendRateRegular();
-					break;
+				if(customerType == 1)
+				{
+					switch(dayName)
+					{
+					case MONDAY:
+					case TUESDAY:
+					case WEDNESDAY:
+					case THURSDAY:
+					case FRIDAY:
+						rent = rent + h.getHotelWeekdayRateRegular();
+						break;
+					case SATURDAY:
+					case SUNDAY:
+						rent = rent + h.getHotelWeekendRateRegular();
+						break;
+					}
+				}
+				else
+				{
+					switch(dayName)
+					{
+					case MONDAY:
+					case TUESDAY:
+					case WEDNESDAY:
+					case THURSDAY:
+					case FRIDAY:
+						rent = rent + h.getHotelWeekdayRateReward();
+						break;
+					case SATURDAY:
+					case SUNDAY:
+						rent = rent + h.getHotelWeekendRateReward();
+						break;
+					}
 				}
 			}
 
@@ -118,7 +181,7 @@ public class HotelReservationMain {
 		System.out.println("with Total rates $" + minimumRent);
 	}
 
-	public static void findCheapBestRatedHotel(LocalDate firstDate, LocalDate lastDate) {
+	public static void findCheapBestRatedHotelRewardORRegular(int customerType,LocalDate firstDate, LocalDate lastDate) {
 		DayOfWeek dayName;
 		int minimumRent = 2147483647;
 		int rent = 0;
@@ -133,18 +196,39 @@ public class HotelReservationMain {
 			for (localFirstDate = firstDate; localFirstDate
 					.isBefore(lastDate); localFirstDate = localFirstDate.plusDays(1)) {
 				dayName = localFirstDate.getDayOfWeek();
-				switch (dayName) {
-				case MONDAY:
-				case TUESDAY:
-				case WEDNESDAY:
-				case THURSDAY:
-				case FRIDAY:
-					rent = rent + h.getHotelWeekdayRateRegular();
-					break;
-				case SATURDAY:
-				case SUNDAY:
-					rent = rent + h.getHotelWeekendRateRegular();
-					break;
+				if(customerType == 1)
+				{
+					switch(dayName)
+					{
+					case MONDAY:
+					case TUESDAY:
+					case WEDNESDAY:
+					case THURSDAY:
+					case FRIDAY:
+						rent = rent + h.getHotelWeekdayRateRegular();
+						break;
+					case SATURDAY:
+					case SUNDAY:
+						rent = rent + h.getHotelWeekendRateRegular();
+						break;
+					}
+				}
+				else
+				{
+					switch(dayName)
+					{
+					case MONDAY:
+					case TUESDAY:
+					case WEDNESDAY:
+					case THURSDAY:
+					case FRIDAY:
+						rent = rent + h.getHotelWeekdayRateReward();
+						break;
+					case SATURDAY:
+					case SUNDAY:
+						rent = rent + h.getHotelWeekendRateReward();
+						break;
+					}
 				}
 			}
 
@@ -164,48 +248,64 @@ public class HotelReservationMain {
 
 		System.out.println(hotelName + " , Rating is " + hotelRatingVar + " with Total rates $" + minimumRent);
 	}
-	
-	public static void findBestRatedHotel(LocalDate firstDate, LocalDate lastDate)
-	{
+
+	public static void findBestRatedHotelRewardORRegular(int customerType,LocalDate firstDate, LocalDate lastDate) {
 		DayOfWeek dayName;
 		int rent = 0;
-		int hotelRatingVar=0;
+		int hotelRatingVar = 0;
 		LocalDate localFirstDate = firstDate;
 		lastDate = lastDate.plusDays(1);
 		String hotelName = "";
-		for(Hotel h : hotelsArrayList)
-		{
-			
-			if(h.getHotelRating()>hotelRatingVar) 
-			{
-			rent =0;
-			hotelRatingVar = h.getHotelRating();
-			hotelName = h.getHotelName();
-			localFirstDate = firstDate;
-			
-			for(localFirstDate=firstDate;localFirstDate.isBefore(lastDate);localFirstDate=localFirstDate.plusDays(1))
-			{
-				dayName = localFirstDate.getDayOfWeek();
-				switch(dayName)
+		for (Hotel h : hotelsArrayList) {
+
+			if (h.getHotelRating() > hotelRatingVar) {
+				rent = 0;
+				hotelRatingVar = h.getHotelRating();
+				hotelName = h.getHotelName();
+				localFirstDate = firstDate;
+
+				for (localFirstDate = firstDate; localFirstDate
+						.isBefore(lastDate); localFirstDate = localFirstDate.plusDays(1)) {
+					dayName = localFirstDate.getDayOfWeek();
+					if(customerType == 1)
 					{
-					case MONDAY:
-					case TUESDAY:
-					case WEDNESDAY:
-					case THURSDAY:
-					case FRIDAY:
-						rent = rent + h.getHotelWeekdayRateRegular();
-						break;
-					case SATURDAY:
-						rent = rent + h.getHotelWeekendRateRegular();
-						break;
-					case SUNDAY:
-						rent = rent + h.getHotelWeekendRateRegular();
-						break;
+						switch(dayName)
+						{
+						case MONDAY:
+						case TUESDAY:
+						case WEDNESDAY:
+						case THURSDAY:
+						case FRIDAY:
+							rent = rent + h.getHotelWeekdayRateRegular();
+							break;
+						case SATURDAY:
+						case SUNDAY:
+							rent = rent + h.getHotelWeekendRateRegular();
+							break;
+						}
 					}
+					else
+					{
+						switch(dayName)
+						{
+						case MONDAY:
+						case TUESDAY:
+						case WEDNESDAY:
+						case THURSDAY:
+						case FRIDAY:
+							rent = rent + h.getHotelWeekdayRateReward();
+							break;
+						case SATURDAY:
+						case SUNDAY:
+							rent = rent + h.getHotelWeekendRateReward();
+							break;
+						}
+					}
+				
+				}
 			}
-			}				
 		}
 
-		System.out.println(hotelName+" & Total rates $"+rent);	
+		System.out.println(hotelName + " & Total rates $" + rent);
 	}
 }
