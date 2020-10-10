@@ -14,6 +14,9 @@ public class HotelReservationMain {
 		for (int i = 0; i < 3; i++) {
 			System.out.println("Enter Hotel Name :");
 			String hotelName = scannerObject.nextLine();
+			
+			System.out.println("Enter Hotel Rating :");
+			int hotelRating=Integer.parseInt(scannerObject.nextLine());
 
 			System.out.println("Enter hotel's weekday rate for regular customer");
 			int hotelWeekdayRateRegular=Integer.parseInt(scannerObject.nextLine());
@@ -21,7 +24,7 @@ public class HotelReservationMain {
 			System.out.println("Enter hotel's weekdend rate for regular customer");
 			int hotelWeekendRateRegular=Integer.parseInt(scannerObject.nextLine());
 			
-			Hotel hotel=new Hotel(hotelName,hotelWeekdayRateRegular,hotelWeekendRateRegular);
+			Hotel hotel=new Hotel(hotelName,hotelRating,hotelWeekdayRateRegular,hotelWeekendRateRegular);
 			hotelsArrayList.add(hotel);
 		}
 		System.out.println("All hotel details addes successfully!");
@@ -63,8 +66,6 @@ public class HotelReservationMain {
 						rent = rent + h.getHotelWeekdayRateRegular();
 						break;
 					case SATURDAY:
-						rent = rent + h.getHotelWeekendRateRegular();
-						break;
 					case SUNDAY:
 						rent = rent + h.getHotelWeekendRateRegular();
 						break;
