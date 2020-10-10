@@ -19,12 +19,18 @@ public class HotelReservationMain {
 			int hotelRating = Integer.parseInt(scannerObject.nextLine());
 
 			System.out.println("Enter hotel's weekday rate for regular customer");
-			int hotelWeekdayRateRegular = Integer.parseInt(scannerObject.nextLine());
-
+			int hotelWeekdayRateRegular=Integer.parseInt(scannerObject.nextLine());
+			
 			System.out.println("Enter hotel's weekdend rate for regular customer");
-			int hotelWeekendRateRegular = Integer.parseInt(scannerObject.nextLine());
-
-			Hotel hotel = new Hotel(hotelName, hotelRating, hotelWeekdayRateRegular, hotelWeekendRateRegular);
+			int hotelWeekendRateRegular=Integer.parseInt(scannerObject.nextLine());
+			
+			System.out.println("Enter hotel's weekday rate for reward customer");
+			int hotelWeekdayRateReward=Integer.parseInt(scannerObject.nextLine());
+			
+			System.out.println("Enter hotel's weekdend rate for reward customer");
+			int hotelWeekendRateReward=Integer.parseInt(scannerObject.nextLine());
+			
+			Hotel hotel=new Hotel(hotelName,hotelRating,hotelWeekdayRateRegular,hotelWeekendRateRegular,hotelWeekdayRateReward,hotelWeekendRateReward);
 			hotelsArrayList.add(hotel);
 		}
 		System.out.println("All hotel details addes successfully!");
