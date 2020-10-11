@@ -24,6 +24,7 @@ public class HotelReservationMain {
 
 	private static ArrayList<Hotel> hotelsArrayList = new ArrayList<Hotel>();
 	private static HashMap<Hotel, Integer> rentMapReward = new HashMap<Hotel, Integer>();
+	private static HashMap<Hotel, Integer> rentMapRegular = new HashMap<Hotel, Integer>();
 
 	public static void main(String[] args) {
 		Scanner scannerObject = new Scanner(System.in);
@@ -94,8 +95,9 @@ public class HotelReservationMain {
 			System.out.println("1.Find Cheapest Hotels");
 			System.out.println("2.Find Cheapest and Best Rated Hotel");
 			System.out.println("3.Find Best Rated Hotel");
-			System.out.println("4.Find Cheapest and Best Rated Hotel for Reward Using Streams");
-			System.out.println("5.Exit");
+			System.out.println("4.Find Cheapest and Best Rated Hotel for Reward Customer Using Streams");
+			System.out.println("5.Find Cheapest and Best Rated Hotel for Regular Customer Using Streams");
+			System.out.println("6.Exit");
 			choice = Integer.parseInt(scannerObject.nextLine());
 			switch (choice) {
 			case 1:
@@ -111,12 +113,30 @@ public class HotelReservationMain {
 				findCheapBestRatedHotelRewardStreams(firstDate, lastDate);
 				break;
 			case 5:
+				findCheapBestRatedHotelRegularStreams(firstDate, lastDate);
+				break;
+			case 6:
 				break;
 			default:
 				System.out.println("Invalid choice, Choose again");
 			}
 
-		} while (choice != 5);
+		} while (choice != 6);
+	}
+
+	private static void findCheapBestRatedHotelRegularStreams(LocalDate firstDate, LocalDate lastDate) {
+		Integer minimumRent = rentMapRegular.entrySet().stream()
+				.min((entry1, entry2) -> entry1.getValue().compareTo(entry2.getValue())).get().getValue();
+
+		List<Hotel> listOfHotelsWithMinRent = rentMapRegular.entrySet().stream()
+				.filter(map -> map.getValue().equals(minimumRent)).map(map -> map.getKey())
+				.collect(Collectors.toList());
+
+		Hotel maxRatingHotel = listOfHotelsWithMinRent.stream().max((entry1, entry2) -> Integer
+				.valueOf(entry1.getHotelRating()).compareTo((Integer) entry2.getHotelRating())).get();
+
+		System.out.println(maxRatingHotel.getHotelName() + " , Rating is " + maxRatingHotel.getHotelRating()
+				+ " with Total rates $" + minimumRent);
 	}
 
 	private static void findCheapBestRatedHotelRewardStreams(LocalDate firstDate, LocalDate lastDate) {
@@ -139,12 +159,14 @@ public class HotelReservationMain {
 	private static void initializeRentMaps(LocalDate firstDate, LocalDate lastDate) {
 
 		DayOfWeek dayName;
-		int rent = 0;
+		int rentRegular = 0;
+		int rentReward = 0;
 		LocalDate localFirstDate = firstDate;
 		lastDate = lastDate.plusDays(1);
 		for (Hotel h : hotelsArrayList) {
 			localFirstDate = firstDate;
-			rent = 0;
+			rentRegular = 0;
+			rentReward = 0;
 			for (localFirstDate = firstDate; localFirstDate
 					.isBefore(lastDate); localFirstDate = localFirstDate.plusDays(1)) {
 				dayName = localFirstDate.getDayOfWeek();
@@ -154,15 +176,18 @@ public class HotelReservationMain {
 				case WEDNESDAY:
 				case THURSDAY:
 				case FRIDAY:
-					rent = rent + h.getHotelWeekdayRateReward();
+					rentReward = rentReward + h.getHotelWeekdayRateReward();
+					rentRegular = rentRegular + h.getHotelWeekdayRateRegular();
 					break;
 				case SATURDAY:
 				case SUNDAY:
-					rent = rent + h.getHotelWeekendRateReward();
+					rentReward = rentReward + h.getHotelWeekendRateReward();
+					rentRegular = rentRegular + h.getHotelWeekendRateRegular();
 					break;
 				}
 			}
-			rentMapReward.put(h, rent);
+			rentMapReward.put(h, rentReward);
+			rentMapRegular.put(h, rentRegular);
 		}
 	}
 
